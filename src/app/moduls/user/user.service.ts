@@ -1,44 +1,50 @@
 import config from '../../config';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
+import { AcademicSemester } from './../academicSemester/academicSemester.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
+import generateStudentId from './user.utils';
 
-const createStudentIntoDB = async (password: string, studentData: TStudent) => {
-  //------------insctance method---------------------
-  // const studentInstance = new Student(student); //create an instance
-  // if (await studentInstance.isUserExists) {
-  //   throw new Error('User already exist');
-  // }
-  // const result = await studentInstance.save();
-  // ---------------------------------------------------
-
-  //set student role
+const createStudentIntoDB = async (password: string, payload: TStudent) => {
+  // Create a user object
   const userData: Partial<TUser> = {};
 
-  //default password if not provided
+  // If password is not provided, use default password
   userData.password = password || (config.default_pass as string);
 
+  // Set student role
   userData.role = 'student';
 
-  userData.id = '2030100001';
+  // Find academic semester info
+  const admissionSemester = await AcademicSemester.findById(
+    payload.admissionSemester,
+  );
 
-  //static method
-  if (await Student.isUserExists(studentData.id)) {
-    throw new Error('User already exist');
+  if (!admissionSemester) {
+    throw new Error('Invalid admission semester');
   }
-  
-  const newUser = await User.create(userData);
 
-  if( Object.keys(newUser).length){
-    studentData.id = newUser.id //embed user id
-    studentData.user = newUser._id // reference to user id
+  // Set generated ID
+  userData.id = await generateStudentId(admissionSemester);
 
-    const newStudent = await Student.create(studentData);
-    return newStudent
+  const isStudentExist = await Student.findOne({ email: payload.email });
+  if (isStudentExist) {
+    throw new Error('User already exists');
+  } else {
+    const newUser = await User.create(userData);
+
+    // Set IDs for student
+    payload.id = newUser.id; // `newUser` is an array because of the `create` method with session
+    payload.user = newUser._id; // Reference user `_id`
+
+    // Create a student
+    await Student.create(payload);
+
+    return newUser;
   }
 };
 
-export const UserService = {
+export const UserServices = {
   createStudentIntoDB,
 };
