@@ -11,5 +11,16 @@ const academicFacultySchema = new Schema<TAcademicFaculty>({
     timestamps: true
 })
 
+academicFacultySchema.pre('findOneAndUpdate',async function (next) {
+    const query = this.getQuery()
+    const isDepertmentExist = await AcademicFaculty.findOne({
+        query
+    })
+    if(!isDepertmentExist){
+        throw new Error('Faculty does not exist')
+    }
+    next()
+})
+
 const AcademicFaculty = model<TAcademicFaculty>('AcademicFaculty', academicFacultySchema)
 export default AcademicFaculty

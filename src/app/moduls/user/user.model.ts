@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
-import { TUser } from './user.interface';
+import { TUser, UserModel } from './user.interface';
 const userSchema = new Schema<TUser>(
   {
     id: {
@@ -36,6 +36,11 @@ const userSchema = new Schema<TUser>(
   },
 );
 
+userSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await User.findOne({ id:id, isDeleted: false });
+  return existingUser;
+}
+
 userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this; // doc
@@ -53,4 +58,4 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-export const User = model<TUser>('User', userSchema);
+export const User = model<TUser, UserModel>('User', userSchema);
