@@ -16,12 +16,12 @@ const getSingleStudent = catchAsync(async (req, res) => {
 });
 
 const getAllStudent = catchAsync(async (req, res) => {
-  const result = await StudentService.getAllStudentFromDB();
-
+  console.log(req.query)
+  const result = await StudentService.getAllStudentFromDB(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Student are retrieved succesfully',
+    message: 'Students are retrieved succesfully',
     data: result,
   });
 });

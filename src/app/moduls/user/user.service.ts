@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import mongoose from 'mongoose';
 import config from '../../config';
 import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
@@ -61,10 +61,10 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //end the session
     session.endSession();
     return newStudent;
-  } catch (error) {
+  } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    throw new AppError('Failed to create student', httpStatus.BAD_REQUEST);
+    throw err;
   }
 };
 

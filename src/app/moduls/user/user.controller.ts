@@ -10,7 +10,7 @@ const createStudent = catchAsync(async (req, res) => {
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: 'Student created successfully',
+      message: 'User created successfully',
       data: result,
     });
 });
@@ -21,7 +21,7 @@ const getAllStudent = catchAsync(async (req, res) => {
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: 'Students retrieved successfully',
+      message: 'Users retrieved successfully',
       data: result,
     });
 })
