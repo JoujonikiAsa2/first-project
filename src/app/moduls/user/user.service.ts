@@ -12,6 +12,9 @@ import httpStatus from 'http-status';
 import { TFaculty } from '../faculty/faculty.interface';
 import { generateFacultyId } from '../faculty/faculty.util';
 import Faculty from '../faculty/faculty.model';
+import { TAdmin } from '../admin/admin.interface';
+import { generateAdminId } from '../admin/admin.util';
+import Admin from '../admin/admin.model';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // create a user object
@@ -93,7 +96,6 @@ const createFacultyIntoDB = async (
     //set generated id
     userData.id = await generateFacultyId();
 
-    
     const newUser = await User.create([userData], { session });
     // console.log('User Created:', newUser);
     if (!newUser.length) {
@@ -117,6 +119,40 @@ const createFacultyIntoDB = async (
     throw error;
   }
 };
+const createAdminIntoDB = async (password: string, payload: TAdmin) => {
+  //create a empty user data
+  const userData: Partial<TUser> = {};
+  userData.password = password || (config.default_pass as string);
+  userData.role = 'admin';
+
+  const session = await mongoose.startSession();
+  try {
+    await session.startTransaction();
+    userData.id = await generateAdminId();
+
+    const newUser = await User.create([userData], { session });
+    // console.log('User',newUser)
+    if (!newUser) {
+      throw new AppError('Failed to creare user', httpStatus.BAD_REQUEST);
+    }
+    
+    // console.log('Admin',payload)
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+    const newAdmin = await Admin.create([payload], { session });
+    console.log('Admin',newAdmin)
+    if (!newAdmin) {
+      throw new AppError('Failed to creare admin', httpStatus.BAD_REQUEST);
+    }
+    await session.commitTransaction();
+    session.endSession();
+    return newAdmin;
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
+};
 
 const getUserFromDB = async () => {
   const result = await User.find();
@@ -127,4 +163,5 @@ export const UserServices = {
   createStudentIntoDB,
   getUserFromDB,
   createFacultyIntoDB,
+  createAdminIntoDB
 };

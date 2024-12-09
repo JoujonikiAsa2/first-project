@@ -1,8 +1,8 @@
 import { model, Schema, Types } from 'mongoose';
-import { FacultyModel, TFaculty } from './faculty.interface';
 import { TUserName } from '../../interface/name';
 import validator from 'validator';
-import { BloodGroup, Gender } from './fauclty.constant';
+import { AdminModel, TAdmin } from './admin.interface';
+import { BloodGroup, Gender } from './admin.constant';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -33,7 +33,7 @@ const userNameSchema = new Schema<TUserName>({
   },
 });
 
-const facultySchema = new Schema(
+const adminSchema = new Schema(
   {
     id: {
       type: String,
@@ -42,7 +42,7 @@ const facultySchema = new Schema(
     },
     designation: {
       type: String,
-      required: [true, 'Designation is required'],
+      required: true,
     },
     name: userNameSchema,
     gender: {
@@ -95,7 +95,7 @@ const facultySchema = new Schema(
     profileImage: {
       type: String,
     },
-    academicDepartment: Types.ObjectId,
+    managementDepartment: Types.ObjectId,
     isDeleted: {
       type: Boolean,
       default: false,
@@ -103,35 +103,14 @@ const facultySchema = new Schema(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-    },
   },
 );
 
-//provide a virtual property fullname
-facultySchema.virtual('fullName').get(function () {
-  return (
-    `${this.name?.firstName} ${this.name?.middleName} ${this.name?.lastName}`
-  )
-});
 
-//find faculty by id
-facultySchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-//for aggregation
-facultySchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
-
-facultySchema.statics.isFacultyExists = async function (id: string) {
-  const existingFaculty = await Faculty.findOne({ id: id, isDeleted: false });
+adminSchema.statics.isAdminExists = async function (id: string) {
+  const existingFaculty = await Admin.findOne({ id: id, isDeleted: false });
   return existingFaculty;
-};
+}
 
-const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
-export default Faculty;
+const Admin = model<TAdmin, AdminModel>('Admin', adminSchema);
+export default Admin;

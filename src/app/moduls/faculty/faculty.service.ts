@@ -5,13 +5,13 @@ import Faculty from './faculty.model';
 import mongoose from 'mongoose';
 import { User } from '../user/user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { facultySearchableFields } from './fauclty.constant';
+import { faucltySearchableFields } from './fauclty.constant';
 
 const getFacultyIntoDB = async (query: Record<string, unknown>) => {
   const faculty =  Faculty.find();
   const facultyQuery = new QueryBuilder(
     faculty, query
-  ).search(facultySearchableFields)
+  ).search(faucltySearchableFields)
   .filter()
   .sort()
   .paginate()
@@ -43,7 +43,7 @@ const updateSingleFacultyIntoDB = async (
     }
   }
 
-  console.log(name);
+  // console.log(name);
   const result = await Faculty.findOneAndUpdate(
     { id: id },
     modifiedUpdatedData,
@@ -52,7 +52,7 @@ const updateSingleFacultyIntoDB = async (
       runValidators: true,
     },
   );
-  console.log(result);
+  // console.log(result);
   return result;
 };
 const deleteSingleFacultyFromDB = async (id: string) => {
