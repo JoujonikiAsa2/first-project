@@ -140,7 +140,6 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
     const newAdmin = await Admin.create([payload], { session });
-    console.log('Admin',newAdmin)
     if (!newAdmin) {
       throw new AppError('Failed to creare admin', httpStatus.BAD_REQUEST);
     }

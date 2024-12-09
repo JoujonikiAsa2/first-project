@@ -25,7 +25,7 @@ const getSingleAdmin = catchAsync(async(req, res) =>{
 const updateSingleAdmin = catchAsync(async(req, res) =>{
     const {adminId} =  req.params
     const {admin} = req.body
-    console.log(admin)
+    // console.log(admin)
     const result = await adminServices.updateSingleAdminIntoDB(adminId, admin)
     sendResponse(res,{
         statusCode: 200,
