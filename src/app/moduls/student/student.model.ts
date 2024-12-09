@@ -4,9 +4,9 @@ import {
   TGuardian,
   TLocalGuardian,
   TStudent,
-  TUserName,
 } from './student.interface';
 import validator from 'validator';
+import { TUserName } from '../../interface/name';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -85,103 +85,106 @@ const localGuradianSchema = new Schema<TLocalGuardian>({
   },
 });
 
-const studentSchema = new Schema<TStudent, StudentModel>({
-  id: { type: String, required: [true, 'ID is required'], unique: true },
-  user: {
-    type: Schema.Types.ObjectId,
-    required: [true, 'User id is required'],
-    unique: true,
-    ref: 'User'
-  },
-  name: {
-    type: userNameSchema,
-    required: [true, 'Name is required'],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ['male', 'female', 'other'],
-      message: '{VALUE} is not a valid gender',
+const studentSchema = new Schema<TStudent, StudentModel>(
+  {
+    id: { type: String, required: [true, 'ID is required'], unique: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
+      unique: true,
+      ref: 'User',
     },
-    required: [true, 'Gender is required'],
-  },
-  dateOfBirth: { type: Date},
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email',
+    name: {
+      type: userNameSchema,
+      required: [true, 'Name is required'],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other'],
+        message: '{VALUE} is not a valid gender',
+      },
+      required: [true, 'Gender is required'],
+    },
+    dateOfBirth: { type: Date },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+      validate: {
+        validator: (value: string) => validator.isEmail(value),
+        message: '{VALUE} is not a valid email',
+      },
+    },
+    contactNo: {
+      type: String,
+      required: [true, 'Contact number is required'],
+    },
+    emergencyContactNo: {
+      type: String,
+      required: [true, 'Emergency contact number is required'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message: '{VALUE} is not a valid blood group',
+      },
+    },
+    presentAddress: {
+      type: String,
+      required: [true, 'Present address is required'],
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, 'Permanent address is required'],
+    },
+    guardian: {
+      type: guardianSchema,
+    },
+    localGuardian: {
+      type: localGuradianSchema,
+      required: [true, 'Local guardian information is required'],
+    },
+    profileImg: { type: String },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
     },
   },
-  contactNo: {
-    type: String,
-    required: [true, 'Contact number is required'],
+  {
+    timestamps: true,
   },
-  emergencyContactNo: {
-    type: String,
-    required: [true, 'Emergency contact number is required'],
-  },
-  bloodGroup: {
-    type: String,
-    enum: {
-      values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-      message: '{VALUE} is not a valid blood group',
-    },
-  },
-  presentAddress: {
-    type: String,
-    required: [true, 'Present address is required'],
-  },
-  permanentAddress: {
-    type: String,
-    required: [true, 'Permanent address is required'],
-  },
-  guardian: {
-    type: guardianSchema,
-  },
-  localGuardian: {
-    type: localGuradianSchema,
-    required: [true, 'Local guardian information is required'],
-  },
-  profileImg: { type: String },
-  admissionSemester:{
-    type: Schema.Types.ObjectId,
-   ref: "AcademicSemester",
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-  academicDepartment: {
-    type: Schema.Types.ObjectId,
-    ref: 'AcademicDepartment',
-  },
-},{
-  timestamps: true
-});
+);
 
 // --------------------virtual----------------------
-studentSchema.virtual('fullName').get(function (){
-  return `${this?.name.firstName}${this?.name.middleName  === "" ? "" : ` ${this?.name.middleName}`} ${this?.name.lastName}`
-})
+studentSchema.virtual('fullName').get(function () {
+  return `${this.name.firstName}${this.name.middleName === '' ? '' : ` ${this.name.middleName}`} ${this.name.lastName}`;
+});
 // ---------------------------------------------
 
 //-----------Query Middleware---------------------
 studentSchema.pre('find', function (next) {
-  this.find({ isDeleted: {$ne: true} });
-  next()
+  this.find({ isDeleted: { $ne: true } });
+  next();
 });
 
-studentSchema.pre('findOne', function ( next) {
-  this.findOne({ isDeleted: {$ne: true} });
-  next()
+studentSchema.pre('findOne', function (next) {
+  this.findOne({ isDeleted: { $ne: true } });
+  next();
 });
 
-studentSchema.pre('aggregate', function ( next) {
-  this.pipeline().unshift({ $match: { isDeleted: {$ne: true} } })
-  next()
+studentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
 });
 
 // ---------------------------------------------

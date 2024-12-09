@@ -9,7 +9,6 @@ const findLastStudentId = async (): Promise<string | undefined> => {
   //2025 01 0001
   return lastStudent?.id ? lastStudent.id : undefined;
 };
-
 export const generateStudentId = async (payload: TAcademicSemester) => {
   // first time 0000
   //0001  => 1
