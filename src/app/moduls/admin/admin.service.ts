@@ -7,7 +7,7 @@ import Admin from './admin.model';
 import { TAdmin } from './admin.interface';
 import { adminSearchableFields } from './admin.constant';
 
-const getAdminIntoDB = async (query: Record<string, unknown>) => {
+const getAllAdminIntoDB = async (query: Record<string, unknown>) => {
   const admin = Admin.find();
   const adminQuery = new QueryBuilder(admin, query)
     .search(adminSearchableFields)
@@ -97,7 +97,7 @@ const deleteSingleAdminFromDB = async (id: string) => {
 };
 
 export const adminServices = {
-  getAdminIntoDB,
+  getAllAdminIntoDB,
   getSingleAdminFromDB,
   updateSingleAdminIntoDB,
   deleteSingleAdminFromDB,

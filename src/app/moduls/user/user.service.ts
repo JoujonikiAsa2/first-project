@@ -10,11 +10,11 @@ import { generateStudentId } from './user.utils';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { TFaculty } from '../faculty/faculty.interface';
-import { generateFacultyId } from '../faculty/faculty.util';
 import Faculty from '../faculty/faculty.model';
 import { TAdmin } from '../admin/admin.interface';
-import { generateAdminId } from '../admin/admin.util';
 import Admin from '../admin/admin.model';
+import { generateFacultyId } from '../faculty/faculty.util';
+import { generateAdminId } from '../admin/admin.util';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // create a user object

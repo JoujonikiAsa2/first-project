@@ -7,7 +7,7 @@ import { User } from '../user/user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { faucltySearchableFields } from './fauclty.constant';
 
-const getFacultyIntoDB = async (query: Record<string, unknown>) => {
+const getAllFacultyIntoDB = async (query: Record<string, unknown>) => {
   const faculty =  Faculty.find();
   const facultyQuery = new QueryBuilder(
     faculty, query
@@ -94,7 +94,7 @@ const deleteSingleFacultyFromDB = async (id: string) => {
 };
 
 export const facultyServices = {
-  getFacultyIntoDB,
+  getAllFacultyIntoDB,
   getSignleFacultyFromDB,
   updateSingleFacultyIntoDB,
   deleteSingleFacultyFromDB,

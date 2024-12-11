@@ -4,13 +4,13 @@ import validateRequest from '../../middlewares/validateRequest';
 import { updateFacultyValidationSchema } from './faculty.validation';
 const router = Router();
 
-router.get('/', facultyControllers.getFaculty);
-router.get('/:facultyId', facultyControllers.getSignleFaculty);
+router.get('/', facultyControllers.getAllFaculty);
+router.get('/:id', facultyControllers.getSignleFaculty);
 router.patch(
-  '/:facultyId',
+  '/:id',
   validateRequest(updateFacultyValidationSchema),
   facultyControllers.updateSingleFaculty,
 );
-router.delete('/:facultyId', facultyControllers.deleteSingleFaculty);
+router.delete('/:id', facultyControllers.deleteSingleFaculty);
 
 export const facultyRoutes = router;
