@@ -7,8 +7,8 @@ import config from '../config';
 import { ZodError } from 'zod';
 import { handleZodError } from '../errors/handleZodError';
 import mongoose from 'mongoose';
-import handleCastError from './handleCastError';
-import handleDuplicateError from './handleDuplicatError';
+import handleCastError from '../errors/handleCastError';
+import handleDuplicateError from '../errors/handleDuplicatError';
 import AppError from '../errors/AppError';
 export const globalErrorHandler: ErrorRequestHandler = (
   err,
