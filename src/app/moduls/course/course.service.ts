@@ -28,7 +28,6 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
 
 const getSingleCourseFromDB = async (id: string) => {
   const existingCourse = await Course.isCourseExists(id);
-  // console.log(existingCourse)
   if (!existingCourse) {
     throw new AppError('Course does not exist', httpStatus.NOT_FOUND);
   }
@@ -39,7 +38,6 @@ const getSingleCourseFromDB = async (id: string) => {
 };
 const updateCourseIntoDB = async (id: string, payload: TCourse) => {
   const { preRequisiteCourses, ...courseRemainingData } = payload;
-  console.log(preRequisiteCourses);
   const session = await mongoose.startSession();
   try {
     await session.startTransaction();
@@ -61,7 +59,6 @@ const updateCourseIntoDB = async (id: string, payload: TCourse) => {
       const deletedPreRequisites = preRequisiteCourses
         .filter((el) => el.course && el.isDeleted)
         .map((el) => el.course);
-      console.log('to delete', deletedPreRequisites);
       const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
         id,
         {
@@ -117,7 +114,6 @@ const assignFacultiesWithCourseIntoDB = async (
   id: string,
   payload: Partial<TCourseFaculty>,
 ) => {
-  console.log(id, payload);
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
     { $addToSet: {faculties: { $each: payload }} },

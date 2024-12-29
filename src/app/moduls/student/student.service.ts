@@ -7,7 +7,7 @@ import httpStatus from 'http-status';
 import { TStudent } from './student.interface';
 import { query } from 'express';
 import QueryBuilder from '../../builder/QueryBuilder';
-import {  studentSearchableFields } from './student.constant';
+import { studentSearchableFields } from './student.constant';
 
 const getAllStudentFromDB = async (query: Record<string, unknown>) => {
   // console.log('Base query:', query);
@@ -56,7 +56,6 @@ const getAllStudentFromDB = async (query: Record<string, unknown>) => {
   // let limit = 1
   // let skip = 0
 
-  
   // if (query.limit) {
   //   limit = Number(query.limit)
   // }
@@ -76,28 +75,27 @@ const getAllStudentFromDB = async (query: Record<string, unknown>) => {
   // const fieldsQuery =  limitQuery.select(fields);
   // return fieldsQuery;
 
-
-  const studentQuery = new QueryBuilder( //call the class 
+  const studentQuery = new QueryBuilder( //call the class
     Student.find()
-    .populate('user')
-    .populate('admissionSemester')
+      .populate('user')
+      .populate('admissionSemester')
       .populate({
         path: 'academicDepartment',
         populate: {
           path: 'academicFaculty',
         },
       }),
-    query
+    query,
   )
-  .search(studentSearchableFields)
-  .filter()
-  .sort()
-  .paginate()
-  .fields()
+    .search(studentSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
   const result = await studentQuery.modelQuery;
-  return result
-}
+  return result;
+};
 
 // const getSingleStudentFromDB = async (id: string) => {
 //   const result = await Student.aggregate([{$match: {id:id}}]);
@@ -105,6 +103,7 @@ const getAllStudentFromDB = async (query: Record<string, unknown>) => {
 // };
 const getSingleStudentFromDB = async (id: string) => {
   const isStudentExist = await Student.isStudentExists(id);
+  console.log(isStudentExist);
   if (!isStudentExist) {
     throw new AppError('Student not found', httpStatus.NOT_FOUND);
   }

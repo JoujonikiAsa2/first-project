@@ -92,7 +92,7 @@ const adminSchema = new Schema(
       type: String,
       required: [true, 'Permanent address is required'],
     },
-    profileImage: {
+    profileImg: {
       type: String,
     },
     managementDepartment: Types.ObjectId,

@@ -9,5 +9,7 @@ const router = express.Router();
 router.post("/login", validateRequest(AuthValidation.loginValidationSchema), authControllers.loginUser);
 router.post("/change-password", auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student), validateRequest(AuthValidation.changePasswordValidationSchema), authControllers.changePassword);
 router.post("/refresh-token", validateRequest(AuthValidation.refreshTokenValidationSchema), authControllers.refreshToken);
+router.post("/forget-password", validateRequest(AuthValidation.forgetPasswordalidationSchema), authControllers.forgetPassword);
+router.post("/reset-password", validateRequest(AuthValidation.resetPasswordValidationSchema), authControllers.resetPassword);
 
 export const authRoutes = router;

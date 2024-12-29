@@ -92,7 +92,7 @@ const facultySchema = new Schema(
       type: String,
       required: [true, 'Permanent address is required'],
     },
-    profileImage: {
+    profileImg: {
       type: String,
     },
     academicDepartment: Types.ObjectId,

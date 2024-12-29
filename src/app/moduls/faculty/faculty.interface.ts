@@ -1,4 +1,5 @@
 import { Model, Types } from 'mongoose';
+import { TUserName } from '../../interface/name';
 
 export type TGender = 'male' | 'female' | 'others';
 export type TBloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
@@ -6,7 +7,7 @@ export type TBloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-
 export type TFaculty = {
   id: string;
   designation: string;
-  name: string;
+  name: TUserName;
   gender: TGender;
   dateOfBirth?: Date;
   email: string;
@@ -16,7 +17,7 @@ export type TFaculty = {
   emergencyContactNo: string;
   presentAddress: string;
   permanentAddress: string;
-  profileImage: string;
+  profileImg: string;
   academicDepartment: Types.ObjectId;
   isDeleted: boolean;
 };
