@@ -7,7 +7,7 @@ import httpStatus from 'http-status';
 //create student
 const createStudent = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
-  const result = await UserServices.createStudentIntoDB(req.file, password, studentData);
+  const result = await UserServices.createStudentIntoDB(req?.file, password, studentData);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -42,12 +42,13 @@ const createAdmin = catchAsync(async (req, res) => {
 
 //get all students
 const getAllStudent = catchAsync(async (req, res) => {
-  const result = await UserServices.getUserFromDB();
+  const result = await UserServices.getAllUsersFromDB(req.query);
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'Users retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

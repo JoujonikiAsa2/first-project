@@ -2,10 +2,13 @@ import { Router } from "express";
 import { semesterRegistrationController } from "./semesterRegistration.controller";
 import { SemesterRegistrationValidations } from "./semesterRegistration.validation";
 import validateRequest from "../../middlewares/validateRequest";
+import auth from "../../middlewares/auth";
+import { USER_ROLE } from "../user/user.constant";
 const router = Router();
 
 router.post(
     '/create-semester-registration',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     validateRequest(
       SemesterRegistrationValidations.createSemesterRegistrationValidationSchema,
     ),
@@ -23,6 +26,7 @@ router.post(
   
   router.patch(
     '/:id',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     validateRequest(
       SemesterRegistrationValidations.upadateSemesterRegistrationValidationSchema,
     ),
@@ -31,6 +35,7 @@ router.post(
   
   router.delete(
     '/:id',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     semesterRegistrationController.deleteSemesterRegistration,
   );
   

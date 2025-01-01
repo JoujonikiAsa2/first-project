@@ -94,6 +94,7 @@ const adminSchema = new Schema(
     },
     profileImg: {
       type: String,
+      default : ''
     },
     managementDepartment: Types.ObjectId,
     isDeleted: {

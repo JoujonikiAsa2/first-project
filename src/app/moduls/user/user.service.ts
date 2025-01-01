@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import config from '../../config';
 import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
 import { TStudent } from '../student/student.interface';
@@ -17,6 +18,9 @@ import Admin from '../admin/admin.model';
 import { generateFacultyId } from '../faculty/faculty.util';
 import { generateAdminId } from '../admin/admin.util';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import AcademicDepartment from '../academicDepartment/academicDepartment.model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import AcademicFaculty from '../academicFaculty/academicFaculty.model';
 
 const createStudentIntoDB = async (
   file: any,
@@ -38,6 +42,24 @@ const createStudentIntoDB = async (
     payload.admissionSemester,
   );
 
+  if (!admissionSemester) {
+    throw new AppError('Academic Semester not found', httpStatus.NOT_FOUND);
+  }
+
+  // find department
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+
+  if (!academicDepartment) {
+    throw new AppError('Aademic department not found', httpStatus.BAD_REQUEST);
+  }
+
+  const academicFaculty = await AcademicFaculty.findById(
+    academicDepartment.academicFaculty,
+  );
+
   //create a isolated environment
   const session = await mongoose.startSession();
 
@@ -50,17 +72,19 @@ const createStudentIntoDB = async (
       admissionSemester as TAcademicSemester,
     );
 
-    // console.log("User Data:", userData)
     // create a user
 
-    //image name
-    const imageName = `${payload?.name?.firstName}-${userData.id}`;
-    const path = file.path;
-    //send image to cloudinary
-    const { secure_url } = (await sendImageToCloudinary(
-      imageName,
-      path,
-    )) as any;
+    if (file) {
+      //image name
+      const imageName = `${payload?.name?.firstName}-${userData.id}`;
+      const path = file?.path;
+      //send image to cloudinary
+      const { secure_url } = (await sendImageToCloudinary(
+        imageName,
+        path,
+      )) as any;
+      payload.profileImg = secure_url as string;
+    }
 
     const newUser = await User.create([userData], { session });
 
@@ -72,7 +96,7 @@ const createStudentIntoDB = async (
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = secure_url;
+    payload.academicFaculty = academicFaculty?._id;
 
     const newStudent = await Student.create([payload], { session });
 
@@ -106,6 +130,20 @@ const createFacultyIntoDB = async (
   userData.role = 'faculty';
   userData.email = payload?.email;
 
+  // find department
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError('Aademic department not found', httpStatus.BAD_REQUEST);
+  }
+
+  const academicFaculty = await AcademicFaculty.findById(
+    academicDepartment.academicFaculty,
+  );
+
+
   const session = await mongoose.startSession();
 
   try {
@@ -114,15 +152,17 @@ const createFacultyIntoDB = async (
     //set generated id
     userData.id = await generateFacultyId();
 
-    //image name
-    const imageName = `${payload?.name?.firstName}-${userData.id}`;
-    const path = file.path;
-
-    const { secure_url } = (await sendImageToCloudinary(
-      imageName,
-      path,
-    )) as any;
-
+    if (file) {
+      //image name
+      const imageName = `${payload?.name?.firstName}-${userData.id}`;
+      const path = file.path;
+      //send image to cloudinary
+      const { secure_url } = (await sendImageToCloudinary(
+        imageName,
+        path,
+      )) as any;
+      payload.profileImg = secure_url;
+    }
     const newUser = await User.create([userData], { session });
     // console.log('User Created:', newUser);
     if (!newUser.length) {
@@ -131,7 +171,7 @@ const createFacultyIntoDB = async (
 
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-    payload.profileImg = secure_url;
+    payload.academicFaculty = academicFaculty?._id;
 
     const newFaculty = await Faculty.create([payload], { session });
     if (!newFaculty.length) {
@@ -163,14 +203,17 @@ const createAdminIntoDB = async (
     await session.startTransaction();
     userData.id = await generateAdminId();
 
-    //image name
-    const imageName = `${payload?.name?.firstName}-${userData.id}`;
-    const path = file.path;
-
-    const { secure_url } = (await sendImageToCloudinary(
-      imageName,
-      path,
-    )) as any;
+    if (file) {
+      //image name
+      const imageName = `${payload?.name?.firstName}-${userData.id}`;
+      const path = file.path;
+      //send image to cloudinary
+      const { secure_url } = (await sendImageToCloudinary(
+        imageName,
+        path,
+      )) as any;
+      payload.profileImg = secure_url;
+    }
 
     const newUser = await User.create([userData], { session });
     // console.log('User',newUser)
@@ -181,7 +224,6 @@ const createAdminIntoDB = async (
     // console.log('Admin',payload)
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-    payload.profileImg = secure_url;
     const newAdmin = await Admin.create([payload], { session });
     if (!newAdmin) {
       throw new AppError('Failed to creare admin', httpStatus.BAD_REQUEST);
@@ -195,9 +237,11 @@ const createAdminIntoDB = async (
     throw err;
   }
 };
-const getUserFromDB = async () => {
-  const result = await User.find();
-  return result;
+const getAllUsersFromDB = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(User.find(), query);
+  const result = await userQuery.modelQuery;
+  const meta = await userQuery.count();
+  return { meta, result };
 };
 const getMe = async (userId: string, role: string) => {
   let result = null;
@@ -220,7 +264,7 @@ const changeStatus = async (id: string, payload: { status: string }) => {
 
 export const UserServices = {
   createStudentIntoDB,
-  getUserFromDB,
+  getAllUsersFromDB,
   createFacultyIntoDB,
   createAdminIntoDB,
   getMe,

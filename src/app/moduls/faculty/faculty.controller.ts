@@ -5,13 +5,13 @@ import { facultyServices } from "./faculty.service";
 
 const getAllFaculty = catchAsync(async(req, res) =>{
     const query = req.query
-    console.log("test",req.cookies)
     const result = await facultyServices.getAllFacultyIntoDB(query)
     sendResponse(res,{
         statusCode: httpStatus.OK,
         success: true,
         message: "Faculties retrived Successfully!",
-        data: result
+        meta:result.meta,
+        data: result.result
     })
 })
 const getSignleFaculty = catchAsync(async(req, res) =>{

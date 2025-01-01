@@ -92,10 +92,9 @@ const facultySchema = new Schema(
       type: String,
       required: [true, 'Permanent address is required'],
     },
-    profileImg: {
-      type: String,
-    },
+    profileImg: { type: String, default:""},
     academicDepartment: Types.ObjectId,
+    academicFaculty: Types.ObjectId,
     isDeleted: {
       type: Boolean,
       default: false,

@@ -6,7 +6,7 @@ export type TUser = {
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
-  role: 'admin' | 'student' | 'faculty';
+  role: 'superAdmin' | 'admin' | 'student' | 'faculty';
   status: 'in-progress' | 'blocked';
   isDeleted: boolean;
 };
@@ -19,5 +19,8 @@ export interface UserModel extends Model<TUser> {
   ): Promise<boolean>;
   isDeleted(is: string): Promise<TUser | null>;
   isBlocked(is: string): Promise<TUser | null>;
-  isJWTIssuedBefforePasswordChanged(passwordChangedTimestamp: Date, JWTIssuedTimestamp: number): Promise<boolean>;
+  isJWTIssuedBefforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    JWTIssuedTimestamp: number,
+  ): Promise<boolean>;
 }

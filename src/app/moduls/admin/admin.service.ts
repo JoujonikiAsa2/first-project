@@ -16,7 +16,8 @@ const getAllAdminIntoDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields();
   const result = await adminQuery.modelQuery;
-  return result;
+  const meta = await adminQuery.count();
+  return {meta,result};
 };
 const getSingleAdminFromDB = async (id: string) => {
   const existingAdmin = await Admin.isAdminExists(id);

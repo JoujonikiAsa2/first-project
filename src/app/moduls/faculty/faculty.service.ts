@@ -8,21 +8,20 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { faucltySearchableFields } from './fauclty.constant';
 
 const getAllFacultyIntoDB = async (query: Record<string, unknown>) => {
-  const faculty =  Faculty.find();
-  const facultyQuery = new QueryBuilder(
-    faculty, query
-  ).search(faucltySearchableFields)
-  .filter()
-  .sort()
-  .paginate()
-  .fields()
-  ;
-  const result = await facultyQuery.modelQuery
-  return result;
+  const faculty = Faculty.find().populate('academicDepartment academicFaculty');
+  const facultyQuery = new QueryBuilder(faculty, query)
+    .search(faucltySearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const result = await facultyQuery.modelQuery;
+  const meta = await facultyQuery.count();
+  return { meta, result };
 };
 const getSignleFacultyFromDB = async (id: string) => {
   const existingFaculty = await Faculty.isFacultyExists(id);
-  if (!existingFaculty) { 
+  if (!existingFaculty) {
     throw new AppError('Faculty not found', httpStatus.NOT_FOUND);
   }
   const result = await Faculty.findOne({ id: id });
@@ -58,7 +57,7 @@ const updateSingleFacultyIntoDB = async (
 const deleteSingleFacultyFromDB = async (id: string) => {
   const existingFaculty = await Faculty.isFacultyExists(id);
   const isUserExist = await User.isUserExists(id);
-  if (!existingFaculty && !isUserExist || !isUserExist) {
+  if ((!existingFaculty && !isUserExist) || !isUserExist) {
     throw new AppError('Faculty not found', httpStatus.NOT_FOUND);
   }
   const session = await mongoose.startSession();
@@ -67,7 +66,7 @@ const deleteSingleFacultyFromDB = async (id: string) => {
     const deletedFaculty = await Faculty.findOneAndUpdate(
       { id: id },
       { isDeleted: true },
-      { new: true,session },
+      { new: true, session },
     );
 
     if (!deletedFaculty) {
