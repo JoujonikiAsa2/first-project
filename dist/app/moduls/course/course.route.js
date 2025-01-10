@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.courseRoutes = void 0;
+const express_1 = require("express");
+const course_controller_1 = require("./course.controller");
+const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+const course_validation_1 = require("./course.validation");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const user_constant_1 = require("../user/user.constant");
+const router = (0, express_1.Router)();
+router.post('/create-course', (0, auth_1.default)(user_constant_1.USER_ROLE.superAdmin, user_constant_1.USER_ROLE.admin), course_controller_1.courseController.createCourse);
+router.get('/', course_controller_1.courseController.getAllCourses);
+router.get('/:id', course_controller_1.courseController.getSingleCourse);
+router.patch('/:id', (0, auth_1.default)(user_constant_1.USER_ROLE.superAdmin, user_constant_1.USER_ROLE.admin), course_controller_1.courseController.updateSingleCourse);
+router.delete('/:id', (0, auth_1.default)(user_constant_1.USER_ROLE.superAdmin, user_constant_1.USER_ROLE.admin), course_controller_1.courseController.deleteSingleCourse);
+router.put('/:courseId/assign-faculties', (0, auth_1.default)(user_constant_1.USER_ROLE.superAdmin, user_constant_1.USER_ROLE.admin), (0, validateRequest_1.default)(course_validation_1.courseValidations.facultiesWithCourseValidationSchema), course_controller_1.courseController.assignFaculties);
+router.get('/:courseId/get-course-faculties', (0, auth_1.default)(user_constant_1.USER_ROLE.superAdmin, user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.faculty, user_constant_1.USER_ROLE.student), (0, validateRequest_1.default)(course_validation_1.courseValidations.facultiesWithCourseValidationSchema), course_controller_1.courseController.getFacultiesWithCourse);
+router.delete('/:courseId/remove-faculties', (0, auth_1.default)(user_constant_1.USER_ROLE.superAdmin, user_constant_1.USER_ROLE.admin), (0, validateRequest_1.default)(course_validation_1.courseValidations.facultiesWithCourseValidationSchema), course_controller_1.courseController.deleteAssignedFaculty);
+exports.courseRoutes = router;
